@@ -1,4 +1,4 @@
-we will win :
+Objective :
 🧠 System thinking + reliability + explainability + real-world alignment
 
 This system should:
