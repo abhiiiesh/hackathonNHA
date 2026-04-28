@@ -1,240 +1,115 @@
-Objective :
-🧠 System thinking + reliability + explainability + real-world alignment
+# 🏥 Automated Medical Claims Adjudication & Fraud Detection
+**NHA Hackathon Submission | Track: Intelligent Claims Processing & Auto-Adjudication**
 
-This system should:
+## 🎯 Problem Statement Mapping
+The National Health Authority (NHA) processes millions of claims under Ayushman Bharat PM-JAY. Manual adjudication is slow, error-prone, and susceptible to sophisticated fraud. 
+This project builds an **AI-driven, NHCX-ready Claims Adjudication Engine** that automates clinical validation against Standard Treatment Guidelines (STGs) while maintaining strict human-in-the-loop audibility and fraud detection.
 
-Handle millions of claims
-Work across languages + hospitals
-Be auditable (gov requirement)
-Be self-improving
-Be fraud-resistant
+---
 
-🏗️ FINAL ARCHITECTURE (1-YEAR SYSTEM)
+## 🚀 MVP Scope.
 
-I’ll structure this in layers — like a real enterprise system.
+For the Hackathon MVP, we focused on the core **"Zero-Trust Clinical Validation"** loop, prioritizing Explainability over scale.
 
-🧱 1. DATA INGESTION LAYER (Hospital Interface)
-What you build:
-API + Upload system
-Mobile capture support
-Real-time validation
-Features:
-📸 Smart capture guidance (blur, tilt, lighting)
-📄 Multi-format ingestion (PDF, images, DICOM)
-🏥 Hospital system integration (ABDM/NHCX-ready)
+### 🏆 Hackathon MVP Scope (Implemented)
+- **STG Knowledge Graph (RAG):** Ingestion of 7 specialities of Set-28 STG PDFs into a vector database (ChromaDB).
+- **Core Reasoning Engine:** LLM-based evaluation of extracted claim data against the STG knowledge base.
+- **Explainability Layer:** Outputting clear Approve/Reject decisions with exact rule-to-evidence mappings.
+- **Demo UI:** Streamlit dashboard for end-to-end visualization.
 
+### 🔭 1-Year Target Architecture (Planned)
+- **Visual Forensics:** Forgery and deepfake detection on uploaded documents.
+- **Temporal Reasoning:** Event-sequence anomaly detection (e.g., procedure before admission).
+- **Graph ML Fraud Detection:** Network analysis of hospitals and patients to catch organized fraud rings.
+- **Enterprise Scale:** Microservices via Kubernetes & Kafka handling 50K+ claims/day.
 
-🧠 2. DOCUMENT UNDERSTANDING LAYER
-Components:
-🔹 OCR Engine (Hybrid)
-PaddleOCR + TrOCR (deep learning OCR)
-Language detection + script normalization
-🔹 Layout Intelligence
-LayoutLMv3 / Donut
-Table parsing + section segmentation
-🔹 Document Classification
-Fine-tuned multimodal model
-Continuous learning
+---
 
+## 🎬 Demo Narrative
+The system follows a strict, transparent pipeline:
+1. **Input:** A user (hospital/TPA) uploads a medical claim document (PDF/Image) via the UI.
+2. **Extraction:** The system extracts structured data (Patient Demographics, Diagnosis, Procedures, Line Items).
+3. **Retrieval:** Based on the Diagnosis, the system queries the local RAG Vector Database for the exact STG rule (e.g., "General Medicine - Rehabilitation").
+4. **Adjudication:** The Reasoning Engine evaluates the claim against the STG.
+5. **Output (Explainability):** The UI displays a `Decision` (APPROVED, REJECTED, CONDITIONAL) along with a `Confidence Score` and a natural language `Explanation` detailing *why* the decision was made, highlighting the relevant STG clause.
 
-👁️ 3. VISUAL FORENSICS LAYER
-Detect:
-Stamps
-Signatures
-QR / barcodes
-Implant stickers
-Advanced (1-year level):
-Forgery detection (PS3 integration)
-Deepfake document detection
-Tampering localization
+---
 
+## ⚙️ Implementation Details
 
-🧬 4. CLINICAL INTELLIGENCE LAYER (CORE)
+### Repository Structure
+```text
+hackathonNHA/
+├── Standard_Treatment_Guidelines_Set_28/ # Raw STG PDFs from NHA
+├── app/
+│   ├── README.md               # You are here
+│   ├── main.py                 # FastAPI Application (API Layer)
+│   ├── ui.py                   # Streamlit Dashboard (Demo UI)
+│   ├── stg_indexer.py          # Script to ingest PDFs into ChromaDB
+│   ├── models/                 # Pydantic Schemas
+│   └── services/               # Extraction, RAG, and Adjudication logic
+├── env/                        # Virtual Environment
+└── requirements.txt            # Python Dependencies
+```
 
-This is your biggest differentiator
+### Setup & Installation
+1. **Clone & Environment Setup:**
+   ```bash
+   git clone <repo-url>
+   cd hackathonNHA
+   python -m venv env
+   source env/bin/activate  # On Windows use `env\Scripts\activate`
+   pip install -r requirements.txt
+   ```
+2. **Environment Variables:**
+   Create a `.env` file in the `app/` directory:
+   ```env
+   LLM_API_KEY=your_api_key_here
+   ```
+3. **Build the STG Database (Run Once):**
+   ```bash
+   python app/stg_indexer.py
+   ```
+4. **Run the Backend API:**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+5. **Run the Demo UI:**
+   ```bash
+   streamlit run app/ui.py
+   ```
 
-🔥 A. Medical NLP Engine
-BioBERT / ClinicalBERT (fine-tuned)
-ICD mapping
-Procedure normalization
-🔥 B. STG KNOWLEDGE SYSTEM (UPGRADED)
+---
 
-Not static JSON anymore.
+## 📊 Evaluation & Metrics (SLA)
+To prove production-readiness, our system is evaluated against the following targets:
+- **Precision/Recall on STG Retrieval:** > 92% accuracy in retrieving the correct STG clause for a given diagnosis.
+- **Latency SLA:** < 3 seconds for document extraction to decision output.
+- **Expected Manual Effort Reduction:** 40% reduction in level-1 manual review for clear-cut cases.
+- **Explainability Score:** 100% of auto-rejected claims feature a traceable, human-readable reason code.
 
-Build:
+---
 
-🧠 STG Knowledge Graph + Retrieval System
+## 🇮🇳 Compliance & Localization
+- **NHCX / ABDM Ready:** Architecture is designed to interface with the National Health Claims Exchange (NHCX) JSON payload standards.
+- **Data Privacy:** PII masking at the extraction layer to comply with the Digital Personal Data Protection (DPDP) Act.
+- **Auditability:** Every LLM decision logs the exact context chunk and temperature used, fulfilling government audit requirements.
 
-Example:
-Diagnosis → Nodes → Allowed Treatments → Required Docs → Timeline → Cost
-Add:
-Vector DB (FAISS / Pinecone)
-Semantic retrieval
+---
 
-👉 This becomes:
+### Detailed 14-Layer Architecture Framework (Reference)
 
-RAG for clinical validation
-
-🔥 C. Clinical Reasoning Engine
-
-Move beyond rules:
-
-Hybrid:
-Rule-based
-ML-assisted reasoning
-
-Example:
-
-“Is MRI justified for this diagnosis?”
-
-
-⚖️ 5. RULE ENGINE (ENTERPRISE LEVEL)
-
-Upgrade from simple rules →
-
-🔥 Features:
-Rule hierarchy:
-Critical
-Major
-Minor
-Rule dependencies
-Confidence-aware rules
-Versioning (VERY IMPORTANT for govt)
-Example:
-Rule v1.2 → Pneumonia → requires X-ray
-
-
-⏱️ 6. TEMPORAL REASONING ENGINE
-
-Upgrade timeline to:
-
-Event graph (not just list)
-Temporal constraints engine
-Example:
-Investigation BEFORE procedure
-Procedure BEFORE discharge
-Add:
-Sequence anomaly detection
-Episode mismatch detection
-
-
-🕵️ 7. FRAUD & ANOMALY DETECTION LAYER
-
-This is where top systems win.
-
-🔥 Add:
-A. Pattern Detection
-Same patient → multiple claims
-Same hospital → abnormal patterns
-B. Graph ML
-Build:
-Patient graph
-Hospital graph
-Procedure graph
-C. Anomaly Detection
-Isolation Forest / Autoencoders
-Outlier billing
-Unusual LOS
-
-
-🤖 8. DECISION ENGINE (SMART)
-
-Not just rule aggregation.
-
-Add:
-Weighted scoring
-Risk score
-Confidence calibration
-Output:
-{
-  "decision": "CONDITIONAL",
-  "risk_score": 0.72,
-  "confidence": 0.88
-}
-
-
-🔍 9. EXPLAINABILITY LAYER (CRITICAL)
-
-Gov systems REQUIRE this.
-
-Provide:
-Rule → Evidence mapping
-Highlighted document regions
-Reason codes
-Add:
-Natural language explanation (LLM)
-Audit logs
-
-
-🔁 10. LEARNING SYSTEM (GAME CHANGER)
-Feedback loop:
-Human correction → system learns
-Rejected claims → model update
-Types:
-Active learning
-Rule tuning
-Model fine-tuning
-
-
-🧑‍⚖️ 11. HUMAN-IN-THE-LOOP SYSTEM
-
-Because:
-
-Govt will NEVER fully trust automation
-
-Add:
-Reviewer dashboard
-Escalation system
-Manual override
-
-
-☁️ 12. SCALABILITY LAYER
-Architecture:
-Microservices
-Kafka (event-driven)
-Kubernetes
-Handles:
-50K+ claims/day
-
-
-🔐 13. SECURITY & COMPLIANCE
-Add:
-Data encryption
-Access control
-Audit trails
-HIPAA-like compliance
-
-
-🧪 14. EVALUATION & MONITORING
-Track:
-Accuracy
-False positives
-Processing time
-Add:
-Model drift detection
-
-🏗️ FINAL SYSTEM FLOW
-
-Hospital → Ingestion API
-↓
-Smart preprocessing
-↓
-OCR + Layout + Classification
-↓
-Extraction
-↓
-Knowledge Retrieval (STG)
-↓
-Rule Engine + Clinical Reasoning
-↓
-Timeline Engine
-↓
-Fraud Detection
-↓
-Decision Engine
-↓
-Explainability Layer
-↓
-Human Review (if needed)
-↓
-Feedback Loop → Learning
+1. **Data Ingestion:** Multi-format (PDF/DICOM), ABDM-ready.
+2. **Document Understanding:** PaddleOCR + LayoutLMv3.
+3. **Visual Forensics:** Implant sticker & signature validation.
+4. **Clinical Intelligence:** RAG for STG validation (Implemented).
+5. **Rule Engine:** Confidence-aware hierarchical rules.
+6. **Temporal Reasoning:** Episode mismatch detection.
+7. **Fraud Detection:** Isolation forests and Hospital-Patient Graph ML.
+8. **Decision Engine:** Weighted risk scoring.
+9. **Explainability Layer:** Rule-evidence mapping (Implemented).
+10. **Learning System:** Human-in-the-loop active learning.
+11. **Human Review:** Escalation dashboards.
+12. **Scalability:** Kafka + Kubernetes.
+13. **Security:** Data encryption at rest.
+14. **Evaluation:** Model drift detection.
